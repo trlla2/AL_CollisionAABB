@@ -27,7 +27,10 @@ void setup(){
   walls = new PVector[num_wall]; // reservamo la longitud de la array
   
   for(int i = 0; i < num_wall; i++){
-    walls[i] = new PVector((int)random(0 + width_wall,width - width_wall),(int)random(0 + height_wall,height - height_wall)); // reservamos los elementos del vector
+    walls[i] = new PVector(
+      (int)random(0 + width_wall,width - width_wall),
+      (int)random(0 + height_wall,height - height_wall)
+    ); // reservamos los elementos del vector
   }
 }
 
@@ -64,17 +67,30 @@ void draw(){
 void mouseMoved(){ // on mouse moved
   
   PVector max_wall_values = new PVector(0,0); // guardamos maxY y maxX
+  PVector min_wall_values = new PVector(0,0);
+  
   // Xmin Ymin del pj son igual a mouseX - 2/height_wall, mouseY - 2/width_wall ya que printamos el muro desdel centro
   PVector PJ_min = new PVector( mouseY - 2/height_wall, mouseX - 2/width_wall);
   PVector PJ_max = new PVector( mouseY + 2/height_wall, mouseX + 2/width_wall);
   
   for(int i =0; i < num_wall; i++){
-    max_wall_values.x = walls[i].x + width_wall; //walls min point
-    max_wall_values.y = walls[i].y + height_wall;
+    // ERROR de clase explicado:
+    // colision de los muros estaba mal calculada
+    // se suponia que la posicion de los muros era el punto minimo cuando la posicion de estos es igual al centro
+    // ya que printamos estos muros desde el centro con el rectMode (mismo error que tenia el profe a la hora de printar el pj)
+    
+    max_wall_values.x = walls[i].x + width_wall/2; // calculamos los min y max values del muro 
+    max_wall_values.y = walls[i].y + height_wall/2;
+    
+    min_wall_values.x = walls[i].x - width_wall/2;
+    min_wall_values.y = walls[i].y - height_wall/2;
     
     //suponemos k pj es el primero y que el wall es el 2
-    if(((PJ_max.x > walls[i].x )||( max_wall_values.x > PJ_min.x)) && ((PJ_max.y > walls[i].y )||( max_wall_values.y > PJ_min.y))) {
-      colision = true;
+    if(((PJ_max.x > min_wall_values.x)||( max_wall_values.x > PJ_min.x)) 
+      && ((PJ_max.y > min_wall_values.y )||( max_wall_values.y > PJ_min.y))) {
+      
+        colision = true;
+        break;
     } else {
       colision = false;
     }
