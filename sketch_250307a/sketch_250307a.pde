@@ -65,35 +65,35 @@ void draw(){
 }
 
 void mouseMoved(){ // on mouse moved
+  colision = false; // rteset colision
   
-  PVector max_wall_values = new PVector(0,0); // guardamos maxY y maxX
-  PVector min_wall_values = new PVector(0,0);
   
-  // Xmin Ymin del pj son igual a mouseX - 2/height_wall, mouseY - 2/width_wall ya que printamos el muro desdel centro
-  PVector PJ_min = new PVector( mouseY - 2/height_wall, mouseX - 2/width_wall);
-  PVector PJ_max = new PVector( mouseY + 2/height_wall, mouseX + 2/width_wall);
+  // Calcular límites del jugador
+  float PJ_left = mouseX - width_wall/2;
+  float PJ_right = mouseX + width_wall/2;
+  float PJ_top = mouseY - height_wall/2;
+  float PJ_bottom = mouseY + height_wall/2;
   
-  for(int i =0; i < num_wall; i++){
-    // ERROR de clase explicado:
-    // colision de los muros estaba mal calculada
-    // se suponia que la posicion de los muros era el punto minimo cuando la posicion de estos es igual al centro
-    // ya que printamos estos muros desde el centro con el rectMode (mismo error que tenia el profe a la hora de printar el pj)
+  for(int i = 0; i < num_wall; i++){
+    // Calcular límites del muro
+    float wall_left = walls[i].x - width_wall/2;
+    float wall_right = walls[i].x + width_wall/2;
+    float wall_top = walls[i].y - height_wall/2;
+    float wall_bottom = walls[i].y + height_wall/2;
     
-    max_wall_values.x = walls[i].x + width_wall/2; // calculamos los min y max values del muro 
-    max_wall_values.y = walls[i].y + height_wall/2;
-    
-    min_wall_values.x = walls[i].x - width_wall/2;
-    min_wall_values.y = walls[i].y - height_wall/2;
-    
-    //suponemos k pj es el primero y que el wall es el 2
-    if(((PJ_max.x > min_wall_values.x)||( max_wall_values.x > PJ_min.x)) 
-      && ((PJ_max.y > min_wall_values.y )||( max_wall_values.y > PJ_min.y))) {
-      
-        colision = true;
-        break;
-    } else {
-      colision = false;
+    // Detección AABB correcta
+    if(PJ_right > wall_left && 
+       PJ_left < wall_right && 
+       PJ_bottom > wall_top && 
+       PJ_top < wall_bottom) {
+      colision = true;
+      break; // Salir del bucle al detectar primera colisión
     }
   }
   
+  
+  // ERROR del profesor explicado:
+    // colision de los muros estaba mal calculada
+    // se suponia que la posicion de los muros era el punto minimo cuando la posicion de estos es igual al centro
+    // ya que printamos estos muros desde el centro con el rectMode (mismo error que tenia el profe a la hora de printar el pj)
 }
